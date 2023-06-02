@@ -12,7 +12,6 @@ KingPiece::KingPiece(QWidget *parent, const Board &b, PieceColour clr)
 
 QList<Position> KingPiece::possibleMoves()
 {
-    // MOET NOG KYK VIR AS DIT IN SKAAK IS!
     Position p;
     QList<Position> moves;
     PieceColour oppositeColour;

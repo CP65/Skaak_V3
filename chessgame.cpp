@@ -108,7 +108,7 @@ void ChessGame::pieceClicked()
     while (mvIter.hasNext())
     {
         Position p = mvIter.next();
-        debugLabel->setText(debugLabel->text() + QString::number(p.x) + ", " + QString::number(p.y) + ";  ");
+        debugLabel->setText(debugLabel->text() + QString::number(p.x) + ", " + QString::number(p.y) + " || ");
     }
 
     // No destination selected and we click on our own colour piece
