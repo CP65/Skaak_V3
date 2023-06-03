@@ -99,6 +99,22 @@ ChessGame::ChessGame(QWidget *parent)
         connect(board[i][8], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
+
+    QMediaPlaylist* playlist = new QMediaPlaylist();
+    playlist->addMedia(QUrl("Skaak_music.mp3"));
+    playlist->setPlaybackMode (QMediaPlaylist::Loop);
+
+    QMediaPlaylist* coolPlaylist = new QMediaPlaylist();
+    coolPlaylist->addMedia(QUrl("COOL_Skaak_Music.mp3"));
+    coolPlaylist->setPlaybackMode((QMediaPlaylist::Loop));
+
+    QMediaPlayer *music = new QMediaPlayer ();
+    music->setPlaylist (coolPlaylist);
+    music->setVolume(75);
+    music->play ();
+
+
+
 }
 
 void ChessGame::pieceClicked()
@@ -142,18 +158,19 @@ void ChessGame::pieceClicked()
 
             if (isCapture)
             {
-                painter.setBrush(QColor(525, 0, 0, 128));
+                painter.setBrush(QColor(255, 0, 0, 128));
             }
             else
             {
                 painter.setBrush(QColor(0, 0, 0, 128));
             }
 
-
-            painter.drawEllipse(0,0,50,50);
+            if (!takenPieces.contains(clickedPiece))
+            {
+                painter.drawEllipse(0,0,50,50);
+            }
 
             possibleMoveLabel->setPixmap(pixmap);
-
 
             QPoint widgetPos = QPoint((p.x - 2.5) * clickedPiece->xwidth + clickedPiece->xoffset - 0 - possibleMoveLabel->width()/2,
                                      (p.y - 2.5) * clickedPiece->ywidth + clickedPiece->yoffset - 0 - possibleMoveLabel->height()/2);

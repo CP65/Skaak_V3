@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "chesspiece.h"
+#include <QMediaPlaylist>
+#include <QMediaPlayer>
 
 class ChessGame : public QWidget
 {
