@@ -101,22 +101,75 @@ ChessGame::ChessGame(QWidget *parent)
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
 
-    mediaPlayer = new QMediaPlayer(this);
-    soundEffectPlayer = new QMediaPlayer(this);
-
-    // Set up the media content for the lofi song
-    QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
-    mediaPlayer->setMedia(lofiSongContent);
-
-    // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
-    connect(soundEffectPlayer, SIGNAL(&QMediaPlayer::mediaStatusChanged), this, SLOT(&ChessGame::handleSoundEffectFinished));
-    mediaPlayer->setVolume(10);
-    mediaPlayer->play();
+    playBackgroundMusic();
 
 }
 
+void ChessGame::showExplosion(int x, int y)
+{
+    explosion = new QMovie("explosion.gif");
+    QLabel *explosionLabel = new QLabel(this);
+
+//    connect(explosion, SIGNAL(frameChanged(int)), this, SLOT(stop()));
+//    explosionLabel->setGeometry(900, 300, 1000, 1000);
+
+    explosionLabel->setMovie(explosion);
+    explosionLabel->show();
+    explosion->start();
+    while(true)
+    {
+        if(explosion->currentFrameNumber() == (explosion->frameCount()-1))
+        {
+            explosion->stop();
+        }
+        break;
+    }
+}
+
+//void ChessGame::stop(int frameNumber)
+//{
+//    if(frameNumber == (explosion->frameCount()-1))
+//    {
+//        explosion->stop();
+//    }
+//}
+
+
+
+//void ChessGame::finished()
+//{
+//    emit finished();
+//}
+
+void ChessGame::playBackgroundMusic()
+{
+    mediaPlayer = new QMediaPlayer(this);
+    // Set up the media content for the lofi song
+    QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
+    mediaPlayer->setMedia(lofiSongContent);
+    mediaPlayer->setVolume(15);
+
+    // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
+    //connect(mediaPlayer, soundEffectPlayer->mediaStatusChanged, this, ChessGame::resumeBackground());
+
+    mediaPlayer->play();
+}
+
+void ChessGame::playMetal()
+{
+    soundEffectPlayer = new QMediaPlayer(this);
+    QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
+    soundEffectPlayer->setMedia(soundEffectContent);
+    soundEffectPlayer->setVolume(40);
+    // Play the sound effect
+    //I know the sound effect plays over the background music, deal with it.
+    soundEffectPlayer->play();
+}
+
+
 void ChessGame::pieceClicked()
 {
+
     clearPossibleMoveLabels();
 
     ChessPiece *clickedPiece = (ChessPiece*)sender();
@@ -294,18 +347,12 @@ bool ChessGame::movePiece(Position &source, Position &destination)
 
                 // Remove taken piece
                 takenPieces.append(board[destination.x][destination.y]);
+                //Play sound effect
+                playMetal();
+                //Show explosion
+                showExplosion(destination.x, destination.y);
 
-                // Pause the lofi song
-                mediaPlayer->pause();
 
-                // Play the sound effect
-                QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
-                soundEffectPlayer->setMedia(soundEffectContent);
-                soundEffectPlayer->setVolume(10);
-                soundEffectPlayer->play();
-
-                // Resume the lofi song
-                mediaPlayer->play();
 
                 //move taken pieces to the side
                  if ((board[destination.x][destination.y]->colour() == White))

@@ -6,6 +6,7 @@
 #include <QMediaPlaylist>
 #include <QMediaPlayer>
 #include <QCoreApplication>
+#include <QMovie>
 
 class ChessGame : public QWidget
 {
@@ -13,7 +14,7 @@ class ChessGame : public QWidget
 
 public:
     ChessGame(QWidget *parent = nullptr);
-
+    void showExplosion(int x, int y);
 
 
 private:
@@ -26,6 +27,7 @@ private:
     QLabel *boardLabel;
     QLabel *turnLabel;
     QLabel *debugLabel;
+    QMovie* explosion;
 
     // Show move circles
     QVector<QLabel*> possibleMoveLabels;
@@ -37,13 +39,17 @@ private:
     QMediaPlayer* mediaPlayer;        // Player for the lofi song
     QMediaPlayer* soundEffectPlayer;  // Player for the sound effect
 
+signals:
+    void finished();
+    void frameChanged(int);
+
+//public slots:
+//    void stop(int);
+
 private slots:
     void pieceClicked();
     void clearPossibleMoveLabels();
-    void handleSoundEffectFinished()
-    {
-            // Resume playing the lofi song
-            mediaPlayer->play();
-    }
+    void playBackgroundMusic();
+    void playMetal();
 };
 #endif // CHESSGAME_H
