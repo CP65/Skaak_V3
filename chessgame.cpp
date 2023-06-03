@@ -9,6 +9,7 @@
 #include "kingpiece.h"
 
 #include <QPainter>
+#include <QTimer>
 
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
@@ -100,20 +101,17 @@ ChessGame::ChessGame(QWidget *parent)
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
 
-    QMediaPlaylist* playlist = new QMediaPlaylist();
-    playlist->addMedia(QUrl("Skaak_music.mp3"));
-    playlist->setPlaybackMode (QMediaPlaylist::Loop);
+    mediaPlayer = new QMediaPlayer(this);
+    soundEffectPlayer = new QMediaPlayer(this);
 
-    QMediaPlaylist* coolPlaylist = new QMediaPlaylist();
-    coolPlaylist->addMedia(QUrl("COOL_Skaak_Music.mp3"));
-    coolPlaylist->setPlaybackMode((QMediaPlaylist::Loop));
+    // Set up the media content for the lofi song
+    QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
+    mediaPlayer->setMedia(lofiSongContent);
 
-    QMediaPlayer *music = new QMediaPlayer ();
-    music->setPlaylist (coolPlaylist);
-    music->setVolume(75);
-    music->play ();
-
-
+    // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
+    connect(soundEffectPlayer, SIGNAL(&QMediaPlayer::mediaStatusChanged), this, SLOT(&ChessGame::handleSoundEffectFinished));
+    mediaPlayer->setVolume(10);
+    mediaPlayer->play();
 
 }
 
@@ -296,6 +294,18 @@ bool ChessGame::movePiece(Position &source, Position &destination)
 
                 // Remove taken piece
                 takenPieces.append(board[destination.x][destination.y]);
+
+                // Pause the lofi song
+                mediaPlayer->pause();
+
+                // Play the sound effect
+                QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
+                soundEffectPlayer->setMedia(soundEffectContent);
+                soundEffectPlayer->setVolume(10);
+                soundEffectPlayer->play();
+
+                // Resume the lofi song
+                mediaPlayer->play();
 
                 //move taken pieces to the side
                  if ((board[destination.x][destination.y]->colour() == White))

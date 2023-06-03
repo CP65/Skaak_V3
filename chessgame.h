@@ -5,6 +5,7 @@
 #include "chesspiece.h"
 #include <QMediaPlaylist>
 #include <QMediaPlayer>
+#include <QCoreApplication>
 
 class ChessGame : public QWidget
 {
@@ -12,6 +13,8 @@ class ChessGame : public QWidget
 
 public:
     ChessGame(QWidget *parent = nullptr);
+
+
 
 private:
     void mousePressEvent(QMouseEvent*);
@@ -24,17 +27,23 @@ private:
     QLabel *turnLabel;
     QLabel *debugLabel;
 
-    // New stuff for showing moves - delete if N/A
+    // Show move circles
     QVector<QLabel*> possibleMoveLabels;
-
 
     PieceColour whoseTurnIsIt;
     Position selectedSource;
     Position selectedDestination;
 
+    QMediaPlayer* mediaPlayer;        // Player for the lofi song
+    QMediaPlayer* soundEffectPlayer;  // Player for the sound effect
+
 private slots:
     void pieceClicked();
-    // New - delete if N/A
     void clearPossibleMoveLabels();
+    void handleSoundEffectFinished()
+    {
+            // Resume playing the lofi song
+            mediaPlayer->play();
+    }
 };
 #endif // CHESSGAME_H
