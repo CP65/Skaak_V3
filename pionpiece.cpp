@@ -45,18 +45,6 @@ QList<Position> PionPiece::possibleMoves()
                 p.y = y+2;
                 moves.append(p);
             }
-            if (board[x-1][y+2] && (board[x-1][y+2]->colour() == White))
-            {
-                p.x = x-1;
-                p.y = y+2;
-                moves.append(p);
-            }
-            if (board[x+1][y+2] && (board[x+1][y+2]->colour() == White))
-            {
-                p.x = x+1;
-                p.y = y+2;
-                moves.append(p);
-            }
         }
     }
     else if (pieceColour == White)
@@ -84,18 +72,6 @@ QList<Position> PionPiece::possibleMoves()
             if (board[x][y-2] == nullptr)
             {
                 p.x = x;
-                p.y = y-2;
-                moves.append(p);
-            }
-            if (board[x-1][y-2] && (board[x-1][y-2]->colour() == Black))
-            {
-                p.x = x-1;
-                p.y = y-2;
-                moves.append(p);
-            }
-            if (board[x+1][y-2] && (board[x+1][y-2]->colour() == Black))
-            {
-                p.x = x+1;
                 p.y = y-2;
                 moves.append(p);
             }
