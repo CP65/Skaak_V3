@@ -31,6 +31,7 @@ ChessGame::ChessGame(QWidget *parent)
     debugLabel = new QLabel(this);
     debugLabel->setGeometry(0, 850, 800, 200);
 
+
     for (int i = 0; i < 12; ++i)
     {
         board[i][0] = new BarrierPiece(this);
@@ -141,7 +142,7 @@ void ChessGame::pieceClicked()
 
             if (isCapture)
             {
-                painter.setBrush(QColor(255, 0, 0,128));
+                painter.setBrush(QColor(525, 0, 0, 128));
             }
             else
             {
@@ -228,6 +229,9 @@ void ChessGame::mousePressEvent(QMouseEvent *e)
     }
 }
 
+ int whiteTakenx = 875;
+ int blackTakenx = 875;
+
 bool ChessGame::movePiece(Position &source, Position &destination)
 {
     // New - delete if N/A
@@ -275,7 +279,20 @@ bool ChessGame::movePiece(Position &source, Position &destination)
 
                 // Remove taken piece
                 takenPieces.append(board[destination.x][destination.y]);
-                board[destination.x][destination.y]->hide();
+
+                //move taken pieces to the side
+                 if ((board[destination.x][destination.y]->colour() == White))
+                 {
+                     whiteTakenx = whiteTakenx + 50;
+                     board[destination.x][destination.y]->move(whiteTakenx, 100);
+                 }
+
+                 if ((board[destination.x][destination.y]->colour() == Black))
+                 {
+                     blackTakenx = blackTakenx + 50;
+                     board[destination.x][destination.y]->move(blackTakenx, 800);
+                 }
+
                 // Move and update the widget (ChessPiece*)
                 board[source.x][source.y]->movePieceTo(destination.x, destination.y);
                 // Update board
