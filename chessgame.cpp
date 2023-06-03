@@ -8,6 +8,8 @@
 #include "queenpiece.h"
 #include "kingpiece.h"
 
+#include <QPainter>
+
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
@@ -100,6 +102,8 @@ ChessGame::ChessGame(QWidget *parent)
 
 void ChessGame::pieceClicked()
 {
+    clearPossibleMoveLabels();
+
     ChessPiece *clickedPiece = (ChessPiece*)sender();
 
     debugLabel->setText("Clicked piece at " + QString::number(clickedPiece->boardX()) +
@@ -110,13 +114,55 @@ void ChessGame::pieceClicked()
     {
         Position p = mvIter.next();
         debugLabel->setText(debugLabel->text() + QString::number(p.x) + ", " + QString::number(p.y) + " || ");
-        QLabel* possibleMoveLabel = new QLabel(boardLabel);
-        possibleMoveLabel->setText("XXXXX");
-        QPoint widgetPos = QPoint((p.x - 2.5) * clickedPiece->xwidth + clickedPiece->xoffset - 2.5,
-                                  (p.y - 2.5) * clickedPiece->ywidth + clickedPiece->yoffset - 2.5);
-        possibleMoveLabel->move(widgetPos);
-        possibleMoveLabel->raise();
-        possibleMoveLabel->show();
+
+        // Drawing possible moves on the board only if it is correct player's turn
+        if ((clickedPiece->colour() == White && whoseTurnIsIt == White) ||
+                (clickedPiece->colour() == Black && whoseTurnIsIt == Black))
+        {
+            QLabel* possibleMoveLabel = new QLabel(boardLabel);
+            possibleMoveLabel->resize(50, 50);
+
+            QPixmap pixmap(50, 50);
+            pixmap.fill(Qt::transparent);
+            QPainter painter(&pixmap);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setPen(Qt::NoPen);
+
+            // Check if it is a capture move
+            bool isCapture = false;
+            if (board[p.x][p.y])
+            {
+                if ((board[p.x][p.y]->colour() == White && clickedPiece->colour() == Black) ||
+                    (board[p.x][p.y]->colour() == Black && clickedPiece->colour() == White))
+                {
+                    isCapture = true;
+                }
+            }
+
+            if (isCapture)
+            {
+                painter.setBrush(QColor(255, 0, 0,128));
+            }
+            else
+            {
+                painter.setBrush(QColor(0, 0, 0, 128));
+            }
+
+
+            painter.drawEllipse(0,0,50,50);
+
+            possibleMoveLabel->setPixmap(pixmap);
+
+
+            QPoint widgetPos = QPoint((p.x - 2.5) * clickedPiece->xwidth + clickedPiece->xoffset - 0 - possibleMoveLabel->width()/2,
+                                     (p.y - 2.5) * clickedPiece->ywidth + clickedPiece->yoffset - 0 - possibleMoveLabel->height()/2);
+
+            possibleMoveLabel->move(widgetPos);
+            possibleMoveLabel->raise();
+            possibleMoveLabel->show();
+
+            possibleMoveLabels.append(possibleMoveLabel);
+        }
     }
 
     // No destination selected and we click on our own colour piece
@@ -137,6 +183,17 @@ void ChessGame::pieceClicked()
                         " dx " + QString::number(selectedDestination.x) + " dy " + QString::number(selectedDestination.y));
 }
 
+// New - delete if N/A
+void ChessGame::clearPossibleMoveLabels()
+{
+
+    for (QLabel* label : possibleMoveLabels)
+    {
+        delete label;
+    }
+    possibleMoveLabels.clear();
+}
+
 void ChessGame::mousePressEvent(QMouseEvent *e)
 {
     // suck these constants out of the barrier piece at [0][0] which will always be there.
@@ -150,6 +207,9 @@ void ChessGame::mousePressEvent(QMouseEvent *e)
     if ((e->button() == Qt::LeftButton) && (e->x() >= xoffset) && (e->x() <= xoffset+8*xwidth)
          && (e->y() >= yoffset) && (e->y() <= yoffset+8*ywidth))
     {
+        // New delete if N/A
+        clearPossibleMoveLabels();
+
         float clickx = ((e->x()-xoffset)/xwidth+2)+0.3;
         float clicky = (e->y()-yoffset)/ywidth+2;
         debugLabel->setText("Clicked on empty board square " + QString::number(clickx) +
@@ -170,6 +230,9 @@ void ChessGame::mousePressEvent(QMouseEvent *e)
 
 bool ChessGame::movePiece(Position &source, Position &destination)
 {
+    // New - delete if N/A
+    clearPossibleMoveLabels();
+
     // The visible board (piece widgets) and invisible state of the board inside member "board" must always be kept in sync.
 
     // This function might look like overkill, but we must code defensively so that lying to this function due to errors in

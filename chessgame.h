@@ -22,6 +22,9 @@ private:
     QLabel *turnLabel;
     QLabel *debugLabel;
 
+    // New stuff for showing moves - delete if N/A
+    QVector<QLabel*> possibleMoveLabels;
+
 
     PieceColour whoseTurnIsIt;
     Position selectedSource;
@@ -29,5 +32,7 @@ private:
 
 private slots:
     void pieceClicked();
+    // New - delete if N/A
+    void clearPossibleMoveLabels();
 };
 #endif // CHESSGAME_H
