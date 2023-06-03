@@ -22,6 +22,7 @@ private:
     QLabel *turnLabel;
     QLabel *debugLabel;
 
+
     PieceColour whoseTurnIsIt;
     Position selectedSource;
     Position selectedDestination;

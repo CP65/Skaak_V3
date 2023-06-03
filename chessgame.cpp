@@ -1,4 +1,5 @@
 #include "chessgame.h"
+#include "chesspiece.h"
 #include "barrierpiece.h"
 #include "pionpiece.h"
 #include "horsepiece.h"
@@ -109,6 +110,13 @@ void ChessGame::pieceClicked()
     {
         Position p = mvIter.next();
         debugLabel->setText(debugLabel->text() + QString::number(p.x) + ", " + QString::number(p.y) + " || ");
+        QLabel* possibleMoveLabel = new QLabel(boardLabel);
+        possibleMoveLabel->setText("XXXXX");
+        QPoint widgetPos = QPoint((p.x - 2.5) * clickedPiece->xwidth + clickedPiece->xoffset - 2.5,
+                                  (p.y - 2.5) * clickedPiece->ywidth + clickedPiece->yoffset - 2.5);
+        possibleMoveLabel->move(widgetPos);
+        possibleMoveLabel->raise();
+        possibleMoveLabel->show();
     }
 
     // No destination selected and we click on our own colour piece
