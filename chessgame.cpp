@@ -11,9 +11,26 @@
 #include <QPainter>
 #include <QTimer>
 
+int a = 0;
+int z = 0;
+int o = 0;
+
+float x1 = 0;
+float y1 = 0;
+
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(timertick()));
+    timer->setInterval(10);
+    timer->start();
+
+    explosion = new QMovie("explosion.gif");
+    explosionLabel = new QLabel(this);
+
+
     whoseTurnIsIt = White;
     selectedSource.x = 0;
     selectedSource.y = 0;
@@ -30,7 +47,7 @@ ChessGame::ChessGame(QWidget *parent)
     turnLabel->setText("White moves.\nClick piece to move.");
 
     debugLabel = new QLabel(this);
-    debugLabel->setGeometry(0, 850, 800, 200);
+    debugLabel->setGeometry(0, 850, 800, 200);    
 
 
     for (int i = 0; i < 12; ++i)
@@ -103,43 +120,62 @@ ChessGame::ChessGame(QWidget *parent)
 
     playBackgroundMusic();
 
+
+
 }
 
-void ChessGame::showExplosion(int x, int y)
+void ChessGame::showExplosion(float x, float y)
 {
-    explosion = new QMovie("explosion.gif");
-    QLabel *explosionLabel = new QLabel(this);
+//    explosion = new QMovie("explosion.gif");
+//    QLabel *explosionLabel = new QLabel(this);
 
 //    connect(explosion, SIGNAL(frameChanged(int)), this, SLOT(stop()));
-//    explosionLabel->setGeometry(900, 300, 1000, 1000);
+    explosionLabel->setGeometry(x, y, 500, 500);
+//    explosionLabel->move(x, y);
+//    explosionLabel->setFixedSize(1000, 500);
 
     explosionLabel->setMovie(explosion);
     explosionLabel->show();
+    explosionLabel->raise();
     explosion->start();
-    while(true)
-    {
-        if(explosion->currentFrameNumber() == (explosion->frameCount()-1))
-        {
-            explosion->stop();
-        }
-        break;
-    }
+    z = 1;
 }
 
-//void ChessGame::stop(int frameNumber)
-//{
-//    if(frameNumber == (explosion->frameCount()-1))
-//    {
-//        explosion->stop();
-//    }
-//}
+void ChessGame::timertick()
+{
+    if(z == 1)
+    {
+
+        if(explosion->currentFrameNumber() >= 25)
+        {
+            explosion->stop();
+           // explosion->dumpObjectInfo();
+           // explosion->disconnect();
+            explosionLabel->hide();
+           //explosion->deleteLater();
+            z = 2;
+        }
+    }
+
+    if(o == 1)
+    {
+        if(soundEffectPlayer->state() == soundEffectPlayer->StoppedState)
+        {
+            mediaPlayer->play();
+            o = 0;
+        }
+    }
 
 
 
-//void ChessGame::finished()
-//{
-//    emit finished();
-//}
+
+
+    //debugging
+//    a = a + 1;
+//    QString stringValue = QString::number(a);
+//    debugLabel->setText(stringValue);
+
+}
 
 void ChessGame::playBackgroundMusic()
 {
@@ -147,7 +183,7 @@ void ChessGame::playBackgroundMusic()
     // Set up the media content for the lofi song
     QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
     mediaPlayer->setMedia(lofiSongContent);
-    mediaPlayer->setVolume(15);
+    mediaPlayer->setVolume(70);
 
     // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
     //connect(mediaPlayer, soundEffectPlayer->mediaStatusChanged, this, ChessGame::resumeBackground());
@@ -160,10 +196,11 @@ void ChessGame::playMetal()
     soundEffectPlayer = new QMediaPlayer(this);
     QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
     soundEffectPlayer->setMedia(soundEffectContent);
-    soundEffectPlayer->setVolume(40);
+    soundEffectPlayer->setVolume(10);
     // Play the sound effect
-    //I know the sound effect plays over the background music, deal with it.
+    mediaPlayer->pause();
     soundEffectPlayer->play();
+    o = 1;
 }
 
 
@@ -281,6 +318,9 @@ void ChessGame::mousePressEvent(QMouseEvent *e)
 
         float clickx = ((e->x()-xoffset)/xwidth+2)+0.3;
         float clicky = (e->y()-yoffset)/ywidth+2;
+
+        x1 = e->x();
+        y1 = e->y();
         debugLabel->setText("Clicked on empty board square " + QString::number(clickx) +
                             ", " + QString::number(clicky));
         debugLabel->setText(debugLabel->text() + "\nEmpty space has no moves.");
@@ -350,7 +390,15 @@ bool ChessGame::movePiece(Position &source, Position &destination)
                 //Play sound effect
                 playMetal();
                 //Show explosion
-                showExplosion(destination.x, destination.y);
+//                x1 = 500;
+//                y1 = 500;
+
+                    QString stringValue = QString::number(x1);
+                    QString stringValue1 = QString::number(y1);
+                    debugLabel->setText(debugLabel->text() + "x1 = " + stringValue);
+                    debugLabel->setText(debugLabel->text() + "y1 = " + stringValue1);
+
+                showExplosion(x1, y1);
 
 
 

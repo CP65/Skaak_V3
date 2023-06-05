@@ -7,6 +7,7 @@
 #include <QMediaPlayer>
 #include <QCoreApplication>
 #include <QMovie>
+#include <QTimer>
 
 class ChessGame : public QWidget
 {
@@ -14,12 +15,14 @@ class ChessGame : public QWidget
 
 public:
     ChessGame(QWidget *parent = nullptr);
-    void showExplosion(int x, int y);
+    void showExplosion(float x, float y);
 
 
 private:
     void mousePressEvent(QMouseEvent*);
     bool movePiece(Position&, Position&);
+
+    QTimer* timer;
 
     Board board;
 
@@ -27,6 +30,7 @@ private:
     QLabel *boardLabel;
     QLabel *turnLabel;
     QLabel *debugLabel;
+    QLabel *explosionLabel;
     QMovie* explosion;
 
     // Show move circles
@@ -51,5 +55,6 @@ private slots:
     void clearPossibleMoveLabels();
     void playBackgroundMusic();
     void playMetal();
+    void timertick();
 };
 #endif // CHESSGAME_H
