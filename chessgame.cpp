@@ -130,11 +130,13 @@ void ChessGame::showExplosion(float x, float y)
 //    QLabel *explosionLabel = new QLabel(this);
 
 //    connect(explosion, SIGNAL(frameChanged(int)), this, SLOT(stop()));
-    explosionLabel->setGeometry(x, y, 500, 500);
+    explosionLabel->setGeometry(x, y, 110, 100);//500, 500); Ek dink die label is te groot dan center die ding nie dis hoekom die offsets nie lekker is nie
 //    explosionLabel->move(x, y);
 //    explosionLabel->setFixedSize(1000, 500);
 
     explosionLabel->setMovie(explosion);
+    //explosionLabel->setAutoFillBackground(true); // REMOVE DIE BACKGROUND HIER
+    explosionLabel->setAttribute(Qt::WA_TransparentForMouseEvents); // Make the label click-through
     explosionLabel->show();
     explosionLabel->raise();
     explosion->start();
@@ -284,6 +286,7 @@ void ChessGame::pieceClicked()
         selectedDestination.x = clickedPiece->boardX();
         selectedDestination.y = clickedPiece->boardY();
         movePiece(selectedSource, selectedDestination);
+        //showExplosion(selectedDestination.x, selectedDestination.y);
     }
     debugLabel->setText(debugLabel->text() + "\nsx " + QString::number(selectedSource.x) + " sy " + QString::number(selectedSource.y) +
                         " dx " + QString::number(selectedDestination.x) + " dy " + QString::number(selectedDestination.y));
@@ -393,12 +396,12 @@ bool ChessGame::movePiece(Position &source, Position &destination)
 //                x1 = 500;
 //                y1 = 500;
 
-                    QString stringValue = QString::number(x1);
-                    QString stringValue1 = QString::number(y1);
-                    debugLabel->setText(debugLabel->text() + "x1 = " + stringValue);
-                    debugLabel->setText(debugLabel->text() + "y1 = " + stringValue1);
+                QString stringValue = QString::number(x1);
+                QString stringValue1 = QString::number(y1);
+                debugLabel->setText(debugLabel->text() + "x1 = " + stringValue);
+                debugLabel->setText(debugLabel->text() + "y1 = " + stringValue1);
 
-                showExplosion(x1, y1);
+                showExplosion(destination.x*75, destination.y*75);
 
 
 
