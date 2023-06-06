@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 QT       += multimedia
 QT       += gui
 
@@ -16,12 +16,14 @@ SOURCES += \
     castlepiece.cpp \
     chessgame.cpp \
     chesspiece.cpp \
+    client.cpp \
     horsepiece.cpp \
     kingpiece.cpp \
     main.cpp \
     mainwindow.cpp \
     pionpiece.cpp \
-    queenpiece.cpp
+    queenpiece.cpp \
+    server.cpp
 
 HEADERS += \
     barrierpiece.h \
@@ -29,11 +31,13 @@ HEADERS += \
     castlepiece.h \
     chessgame.h \
     chesspiece.h \
+    client.h \
     horsepiece.h \
     kingpiece.h \
     mainwindow.h \
     pionpiece.h \
-    queenpiece.h
+    queenpiece.h \
+    server.h
 
 FORMS += \
     mainwindow.ui
