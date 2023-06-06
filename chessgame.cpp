@@ -9,7 +9,7 @@
 #include "kingpiece.h"
 
 #include <QPainter>
-#include <QTimer>
+#include <QVBoxLayout>
 
 int a = 0;
 int z = 0;
@@ -21,6 +21,21 @@ float y1 = 0;
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
+    QPushButton *newGameButton = new QPushButton("NEW GAME", this);
+    connect (newGameButton, &QPushButton::clicked, this, &ChessGame::newGame);
+    newGameButton->setGeometry(600, 400, 600, 25);
+    QPushButton *restartButton = new QPushButton("RESTART", this);
+    connect(restartButton, &QPushButton::clicked, this, &ChessGame::restart);
+    restartButton->setGeometry(600, 450, 600, 25);
+
+//    QVBoxLayout* layout = new QVBoxLayout;
+//    layout->addWidget(newGameButton);
+
+//    QWidget* centralWidget = new QWidget(this);
+//    centralWidget->setLayout(layout);
+
+   // newGameButton->show();
+    setFixedSize(1500, 1000);
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timertick()));
@@ -29,7 +44,6 @@ ChessGame::ChessGame(QWidget *parent)
 
     explosion = new QMovie("explosion.gif");
     explosionLabel = new QLabel(this);
-
 
     whoseTurnIsIt = White;
     selectedSource.x = 0;
@@ -46,8 +60,9 @@ ChessGame::ChessGame(QWidget *parent)
     turnLabel->setGeometry(850, 50, 200, 50);
     turnLabel->setText("White moves.\nClick piece to move.");
 
+
     debugLabel = new QLabel(this);
-    debugLabel->setGeometry(0, 850, 800, 200);    
+    debugLabel->setGeometry(0, 850, 800, 200);
 
 
     for (int i = 0; i < 12; ++i)
@@ -118,22 +133,165 @@ ChessGame::ChessGame(QWidget *parent)
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
 
-    playBackgroundMusic();
+    boardLabel->hide();
+    debugLabel->hide();
+    turnLabel->hide();
 
+    for (int i = 2; i < 10; ++i)
+    {
+        board[i][3]->hide();
+        board[i][2]->hide();
+        board[i][8]->hide();
+        board[i][9]->hide();
 
-
+    }
 }
+
+void ChessGame::newGame()
+{
+    //newGameButton->hide();  //HOEKOM WERK DIT NIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+    boardLabel->show();
+    playBackgroundMusic();
+    debugLabel->show();
+    turnLabel->show();
+
+    for (int i = 2; i < 10; ++i)
+    {
+        board[i][3]->show();
+        board[i][2]->show();
+        board[i][8]->show();
+        board[i][9]->show();
+    }
+}
+
+void ChessGame::restart()
+{
+    QPushButton *newGameButton = new QPushButton("NEW GAME", this);
+    connect (newGameButton, &QPushButton::clicked, this, &ChessGame::newGame);
+    newGameButton->setGeometry(600, 400, 600, 25);
+    QPushButton *restartButton = new QPushButton("RESTART", this);
+    connect(restartButton, &QPushButton::clicked, this, &ChessGame::restart);
+    restartButton->setGeometry(600, 450, 600, 25);
+
+    newGameButton->show();
+    setFixedSize(1500, 1000);
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(timertick()));
+    timer->setInterval(10);
+    timer->start();
+
+    explosion = new QMovie("explosion.gif");
+    explosionLabel = new QLabel(this);
+
+    whoseTurnIsIt = White;
+    selectedSource.x = 0;
+    selectedSource.y = 0;
+    selectedDestination.x = 0;
+    selectedDestination.y = 0;
+
+    boardLabel = new QLabel(this);
+    boardLabel->setGeometry(70, 100, 800, 800);
+    boardLabel->setPixmap(QPixmap("skaakBord2.png").scaled(800,800));
+    // todo: make boardLabel show a nice 800x800 chess board image
+
+    turnLabel = new QLabel(this);
+    turnLabel->setGeometry(850, 50, 200, 50);
+    turnLabel->setText("White moves.\nClick piece to move.");
+
+
+    debugLabel = new QLabel(this);
+    debugLabel->setGeometry(0, 850, 800, 200);
+
+
+    for (int i = 0; i < 12; ++i)
+    {
+        board[i][0] = new BarrierPiece(this);
+        board[i][1] = new BarrierPiece(this);
+
+        board[i][4] = nullptr;
+        board[i][5] = nullptr;
+        board[i][6] = nullptr;
+        board[i][7] = nullptr;
+
+        board[i][10] = new BarrierPiece(this);
+        board[i][11] = new BarrierPiece(this);
+    }
+
+    board[2][2] = new CastlePiece(this, board, Black);
+    board[2][2]->movePieceTo(2, 2);
+    board[3][2] = new HorsePiece(this, board, Black);
+    board[3][2]->movePieceTo(3, 2);
+    board[4][2] = new BishopPiece(this, board, Black);
+    board[4][2]->movePieceTo(4, 2);
+    board[5][2] = new QueenPiece(this, board, Black);
+    board[5][2]->movePieceTo(5, 2);
+    board[6][2] = new KingPiece(this, board, Black);
+    board[6][2]->movePieceTo(6, 2);
+    board[7][2] = new BishopPiece(this, board, Black);
+    board[7][2]->movePieceTo(7, 2);
+    board[8][2] = new HorsePiece(this, board, Black);
+    board[8][2]->movePieceTo(8, 2);
+    board[9][2] = new CastlePiece(this, board, Black);
+    board[9][2]->movePieceTo(9, 2);
+
+    board[2][9] = new CastlePiece(this, board, White);
+    board[2][9]->movePieceTo(2, 9);
+    board[3][9] = new HorsePiece(this, board, White);
+    board[3][9]->movePieceTo(3, 9);
+    board[4][9] = new BishopPiece(this, board, White);
+    board[4][9]->movePieceTo(4, 9);
+    board[5][9] = new QueenPiece(this, board, White);
+    board[5][9]->movePieceTo(5, 9);
+    board[6][9] = new KingPiece(this, board, White);
+    board[6][9]->movePieceTo(6, 9);
+    board[7][9] = new BishopPiece(this, board, White);
+    board[7][9]->movePieceTo(7, 9);
+    board[8][9] = new HorsePiece(this, board, White);
+    board[8][9]->movePieceTo(8, 9);
+    board[9][9] = new CastlePiece(this, board, White);
+    board[9][9]->movePieceTo(9, 9);
+
+    for (int i = 2; i < 10; ++i)
+    {
+        board[0][i] = new BarrierPiece(this);
+        board[1][i] = new BarrierPiece(this);
+
+        board[i][3] = new PionPiece(this, board, Black);
+        board[i][3]->movePieceTo(i, 3);
+
+        board[i][8] = new PionPiece(this, board, White);
+        board[i][8]->movePieceTo(i, 8);
+
+        board[10][i] = new BarrierPiece(this);
+        board[11][i] = new BarrierPiece(this);
+
+        connect(board[i][2], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
+        connect(board[i][3], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
+        connect(board[i][8], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
+        connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
+    }
+
+    boardLabel->hide();
+    debugLabel->hide();
+    turnLabel->hide();
+
+    for (int i = 2; i < 10; ++i)
+    {
+        board[i][3]->hide();
+        board[i][2]->hide();
+        board[i][8]->hide();
+        board[i][9]->hide();
+
+    }
+}
+
+
+
 
 void ChessGame::showExplosion(float x, float y)
 {
-//    explosion = new QMovie("explosion.gif");
-//    QLabel *explosionLabel = new QLabel(this);
-
-//    connect(explosion, SIGNAL(frameChanged(int)), this, SLOT(stop()));
     explosionLabel->setGeometry(x, y, 110, 100);//500, 500); Ek dink die label is te groot dan center die ding nie dis hoekom die offsets nie lekker is nie
-//    explosionLabel->move(x, y);
-//    explosionLabel->setFixedSize(1000, 500);
-
     explosionLabel->setMovie(explosion);
     //explosionLabel->setAutoFillBackground(true); // REMOVE DIE BACKGROUND HIER
     explosionLabel->setAttribute(Qt::WA_TransparentForMouseEvents); // Make the label click-through
@@ -151,10 +309,7 @@ void ChessGame::timertick()
         if(explosion->currentFrameNumber() >= 25)
         {
             explosion->stop();
-           // explosion->dumpObjectInfo();
-           // explosion->disconnect();
             explosionLabel->hide();
-           //explosion->deleteLater();
             z = 2;
         }
     }
@@ -167,9 +322,6 @@ void ChessGame::timertick()
             o = 0;
         }
     }
-
-
-
 
 
     //debugging
@@ -185,7 +337,7 @@ void ChessGame::playBackgroundMusic()
     // Set up the media content for the lofi song
     QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
     mediaPlayer->setMedia(lofiSongContent);
-    mediaPlayer->setVolume(70);
+    mediaPlayer->setVolume(20);
 
     // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
     //connect(mediaPlayer, soundEffectPlayer->mediaStatusChanged, this, ChessGame::resumeBackground());
@@ -198,7 +350,7 @@ void ChessGame::playMetal()
     soundEffectPlayer = new QMediaPlayer(this);
     QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
     soundEffectPlayer->setMedia(soundEffectContent);
-    soundEffectPlayer->setVolume(10);
+    soundEffectPlayer->setVolume(50);
     // Play the sound effect
     mediaPlayer->pause();
     soundEffectPlayer->play();

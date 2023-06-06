@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 #include <QMovie>
 #include <QTimer>
+#include <QPushButton>
 
 class ChessGame : public QWidget
 {
@@ -17,10 +18,16 @@ public:
     ChessGame(QWidget *parent = nullptr);
     void showExplosion(float x, float y);
 
+    QPushButton *newGameButton;
+
 
 private:
     void mousePressEvent(QMouseEvent*);
     bool movePiece(Position&, Position&);
+    void playBackgroundMusic();
+    void playMetal();
+
+  //  QPushButton *newGameButton;
 
     QTimer* timer;
 
@@ -43,18 +50,21 @@ private:
     QMediaPlayer* mediaPlayer;        // Player for the lofi song
     QMediaPlayer* soundEffectPlayer;  // Player for the sound effect
 
-signals:
-    void finished();
-    void frameChanged(int);
+//signals:
+//    void finished();
+//    void frameChanged(int);
 
 //public slots:
 //    void stop(int);
 
+public slots:
+   // void newGame();
+
 private slots:
     void pieceClicked();
     void clearPossibleMoveLabels();
-    void playBackgroundMusic();
-    void playMetal();
     void timertick();
+    void restart();
+    void newGame();
 };
 #endif // CHESSGAME_H
