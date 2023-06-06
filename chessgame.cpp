@@ -393,7 +393,7 @@ bool ChessGame::movePiece(Position &source, Position &destination)
                 //Play sound effect
                 playMetal();
                 //Show explosion
-                x1 = (destination.x*100) - 140;
+                x1 = (destination.x*100) - 150;
                 y1 = (destination.y*100) - 120;
 
                 QString stringValue = QString::number(x1);
