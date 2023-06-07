@@ -65,3 +65,5 @@ PieceType ChessPiece::type()
 {
     return pieceType;
 }
+
+

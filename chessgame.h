@@ -19,6 +19,8 @@ public:
     void showExplosion(float x, float y);
 
     QPushButton *newGameButton;
+    QPushButton *restartButton;
+    QPushButton *mainMenuButton;
 
 
 private:
@@ -27,8 +29,6 @@ private:
     void playBackgroundMusic();
     void playMetal();
 
-  //  QPushButton *newGameButton;
-
     QTimer* timer;
 
     Board board;
@@ -36,6 +36,7 @@ private:
     QList<ChessPiece*> takenPieces;
     QLabel *boardLabel;
     QLabel *turnLabel;
+    QLabel *getRektLabel;
     QLabel *debugLabel;
     QLabel *explosionLabel;
     QMovie* explosion;
@@ -66,5 +67,6 @@ private slots:
     void timertick();
     void restart();
     void newGame();
+    void mainMenu();
 };
 #endif // CHESSGAME_H
