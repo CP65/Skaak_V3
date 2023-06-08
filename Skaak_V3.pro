@@ -23,6 +23,7 @@ SOURCES += \
     mainwindow.cpp \
     pionpiece.cpp \
     queenpiece.cpp \
+    rankings.cpp \
     server.cpp
 
 HEADERS += \
@@ -37,6 +38,7 @@ HEADERS += \
     mainwindow.h \
     pionpiece.h \
     queenpiece.h \
+    rankings.h \
     server.h
 
 FORMS += \

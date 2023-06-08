@@ -9,6 +9,7 @@
 #include <QMovie>
 #include <QTimer>
 #include <QPushButton>
+#include <QLineEdit>
 
 class ChessGame : public QWidget
 {
@@ -22,6 +23,10 @@ public:
     QPushButton *newGameButton;
     QPushButton *restartButton;
     QPushButton *mainMenuButton;
+
+    QLineEdit *lineEdit;
+    QString enteredText;
+    QByteArray text;
 
     int seconds1;
     int minutes1;
@@ -84,5 +89,6 @@ private slots:
     void restart();
     void newGame();
     void mainMenu();
+    void handleTextEntered();
 };
 #endif // CHESSGAME_H
