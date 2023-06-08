@@ -12,6 +12,8 @@
 #include <QPainter>
 #include <QVBoxLayout>
 
+#include <QProcess>
+
 int a = 0;
 int z = 0;
 int o = 0;
@@ -24,12 +26,27 @@ Rankings r;
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
+    fenLabel = new QLabel(this);
+    fenLabel->setText("ffffffffffffffffffffffffffff");
+    fenLabel->setGeometry(900, 500, 500, 100);
+    fenLabel->setStyleSheet("font-weight: bold;"
+                               "font-size: 15px");
+    fenLabel->hide();
+
     lineEdit = new QLineEdit(this);
     lineEdit->setPlaceholderText("Enter your text");  // Set a placeholder text
     lineEdit->setMaxLength(100);  // Set a maximum length for the input
     QString enteredText = lineEdit->text();
     QByteArray text = enteredText.toUtf8();
     connect(lineEdit, SIGNAL(QLineEdit::returnPressed), this, SLOT(ChessGame::handleTextEntered()));
+
+    QString stockfishPath = "stockfish-windows-2022-x86-64-avx2.exe";
+    QProcess stockfishProcess;
+    stockfishProcess.start(stockfishPath);
+
+    // Connect signals and slots to handle the communication
+    connect(&stockfishProcess, &QProcess::readyReadStandardOutput, this, &ChessGame::readStockfishOutput);
+    connect(&stockfishProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &ChessGame::stockfishProcessFinished);
 
     //Rankings r;
     r.addScore("deeznuts", 69);
@@ -243,6 +260,124 @@ ChessGame::ChessGame(QWidget *parent)
     }
 }
 
+void ChessGame::toFEN(Board)
+{
+    QString roww = "";
+    fenLabel->setText("");
+
+    for(int i = 0; i < 8; i++)
+    {
+        int spaces = 0;
+
+        for(int j = 0; j < 8; j++)
+        {
+            if(board[j+2][i+2] == nullptr)
+            {
+                if(board[j+3][i+2] == nullptr)
+                {
+                    spaces++;
+                }
+                else if(board[j+3][i+2] != nullptr)
+                {
+                    spaces++;
+                    roww += QString::number(spaces);
+                    spaces = 0;
+                }
+            }
+            else if(board[j+2][i+2]->type() == Castle)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "r";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "R";
+                }
+
+            }
+            else if(board[j+2][i+2]->type() == Horse)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "n";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "N";
+                }
+            }
+            else if(board[j+2][i+2]->type() == Bishop)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "b";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "B";
+                }
+            }
+            else if(board[j+2][i+2]->type() == Queen)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "q";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "Q";
+                }
+            }
+            else if(board[j+2][i+2]->type() == King)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "k";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "K";
+                }
+            }
+            else if(board[j+2][i+2]->type() == Pion)
+            {
+                if(board[j+2][i+2]->colour() == Black)
+                {
+                   roww += "p";
+                }
+                else if(board[j+2][i+2]->colour() == White)
+                {
+                    roww += "P";
+                }
+            }
+        }
+
+        if(i < 7)
+        {
+           roww += "/";
+        }
+    }
+
+    fenLabel->setText(roww);
+
+}
+
+void ChessGame::readStockfishOutput()
+{
+
+}
+
+void ChessGame::stockfishProcessFinished()
+{
+
+}
+
+void ChessGame::sendCommandToStockfish(const QString& command)
+{
+    stockfishProcess.write((command + '\n').toUtf8());
+}
+
 void ChessGame::handleTextEntered()
 {
    r.addScore("halloooooooooooooooooo", 69);
@@ -326,7 +461,10 @@ void ChessGame::newGame()
     timer1->start();
     timer2Label->show();
     enable();
+
     //timer2->start();
+    toFEN(board);
+    fenLabel->show();
 
     if(p == 0)
     {
@@ -437,6 +575,8 @@ void ChessGame::restart()
         connect(board[i][8], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
+
+    toFEN(board);
 
 }
 
@@ -873,6 +1013,8 @@ bool ChessGame::movePiece(Position &source, Position &destination)
             turnLabel->setText("White moves.\nClick piece to move.");
         }
     }
+
+    toFEN(board);
 
     // In case someone cares
     return moved;

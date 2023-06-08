@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QProcess>
 
 
 class ChessGame : public QWidget
@@ -26,6 +27,13 @@ public:
     QPushButton *mainMenuButton;
     QLineEdit *lineEdit;
 
+    void readStockfishOutput();
+    void stockfishProcessFinished();
+    void sendCommandToStockfish(const QString& command);
+    void toFEN(Board);
+
+    QProcess stockfishProcess;
+
     int seconds1;
     int minutes1;
     int seconds2;
@@ -33,6 +41,8 @@ public:
 
     void disable();
     void enable();
+
+    QLabel *fenLabel;
 
 private:
     void mousePressEvent(QMouseEvent*);
