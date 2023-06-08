@@ -32,7 +32,7 @@ ChessGame::ChessGame(QWidget *parent)
     connect(lineEdit, SIGNAL(QLineEdit::returnPressed), this, SLOT(ChessGame::handleTextEntered()));
 
     //Rankings r;
-    //r.addScore("deeznuts", 69);
+    r.addScore("deeznuts", 69);
 
    // QPushButton *newGameButton = new QPushButton("NEW GAME", this);
     newGameButton = new QPushButton("NEW GAME", this);
@@ -90,6 +90,7 @@ ChessGame::ChessGame(QWidget *parent)
     mainMenuButton->hide();
 
     setFixedSize(1500, 1000);
+
     QPixmap background("background4.jpg");
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(background.scaled(1500, 1000)));
@@ -314,7 +315,7 @@ void ChessGame::disable()
 
 void ChessGame::enable()
 {
-    enabled = 1;
+  enabled = 1;
 }
 
 void ChessGame::newGame()
