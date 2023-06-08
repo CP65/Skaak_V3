@@ -90,6 +90,30 @@ ChessGame::ChessGame(QWidget *parent)
     timer->setInterval(10);
     timer->start();
 
+    timer1 = new QTimer(this);
+    connect(timer1, SIGNAL(timeout()), this, SLOT(timer1tick()));
+    timer1->setInterval(1000);
+    timer1Label = new QLabel(this);
+    timer1Label->setGeometry(900, 900, 200, 100);
+    timer1Label->setText("White: 5:00");
+    timer1Label->setStyleSheet("font-weight: bold;"
+                               "font-size: 30px");
+    timer1Label->hide();
+    seconds1 = 0;
+    minutes1 = 5;
+
+    timer2 = new QTimer(this);
+    connect(timer2, SIGNAL(timeout()), this, SLOT(timer2tick()));
+    timer2->setInterval(1000);
+    timer2Label = new QLabel(this);
+    timer2Label->setGeometry(900, 0, 200, 100);
+    timer2Label->setText("Black: 5:00");
+    timer2Label->setStyleSheet("font-weight: bold;"
+                               "font-size: 30px");
+    timer2Label->hide();
+    seconds2 = 0;
+    minutes2 = 5;
+
     explosion = new QMovie("explosion.gif");
     explosionLabel = new QLabel(this);
 
@@ -206,10 +230,85 @@ ChessGame::ChessGame(QWidget *parent)
     }
 }
 
+void ChessGame::timer1tick()
+{
+
+  if(seconds1 == 0 && minutes1 > 0)
+  {
+      minutes1 = minutes1 - 1;
+      seconds1 = 59;
+  }
+
+  if(seconds1 < 10)
+  {
+      timer1Label->setText("White: " + QString::number(minutes1) + ":0" + QString::number(seconds1));
+  }
+  else if(seconds1 >= 10)
+  {
+       timer1Label->setText("White: " + QString::number(minutes1) + ":" + QString::number(seconds1));
+  }
+
+  if(minutes1 <= 0 && seconds1 <= 0)
+  {
+      timer1Label->setText("Time is up!");
+      timer1->stop();
+      disable();
+  }
+
+  seconds1 = seconds1 - 1;
+}
+
+void ChessGame::timer2tick()
+{
+    if(seconds2 == 0)
+    {
+        minutes2 = minutes2 - 1;
+        seconds2 = 59;
+    }
+
+    if(minutes2 == 0 && seconds2 == 0)
+    {
+        timer2Label->setText("Time is up!");
+    }
+
+    if(seconds2 < 10)
+    {
+        timer2Label->setText("Black: " + QString::number(minutes2) + ":0" + QString::number(seconds2));
+    }
+    else if(seconds2 >= 10)
+    {
+         timer2Label->setText("Black: " + QString::number(minutes2) + ":" + QString::number(seconds2));
+    }
+
+    if(minutes2 <= 0 && seconds2 <= 0)
+    {
+        timer2Label->setText("Time is up!");
+        timer2->stop();
+        disable();
+    }
+
+    seconds2 = seconds2 - 1;
+}
+
+void ChessGame::disable()
+{
+  enabled = 0;
+}
+
+void ChessGame::enable()
+{
+    enabled = 1;
+}
+
 void ChessGame::newGame()
 {
     newGameButton->hide();  //awe dit werk
     boardLabel->show();
+    timer1Label->show();
+    timer1->start();
+    timer2Label->show();
+    enable();
+    //timer2->start();
 
     if(p == 0)
     {
@@ -233,6 +332,17 @@ void ChessGame::newGame()
 void ChessGame::restart()
 {
     newGameButton->hide();
+    enable();
+
+    minutes1 = 5;
+    seconds1 = 0;
+    timer1Label->setText("White: " + QString::number(minutes1) + ":0" + QString::number(seconds1));
+    timer1->start();
+
+    minutes2 = 5;
+    seconds2 = 0;
+    timer2Label->setText("Black: " + QString::number(minutes2) + ":0" + QString::number(seconds2));
+    timer2->stop();
 
     whoseTurnIsIt = White;
     selectedSource.x = 0;
@@ -315,6 +425,7 @@ void ChessGame::restart()
 void ChessGame::mainMenu()
 {
     newGameButton->hide();
+    enable();
 
     whoseTurnIsIt = White;
     selectedSource.x = 0;
@@ -410,9 +521,6 @@ void ChessGame::mainMenu()
     p = 1;
 }
 
-
-
-
 void ChessGame::showExplosion(float x, float y)
 {
     explosionLabel->setGeometry(x, y, 110, 100);
@@ -479,10 +587,11 @@ void ChessGame::playMetal()
     o = 1;
 }
 
-
 void ChessGame::pieceClicked()
 {
+    if(enabled == 1)
 
+{
     clearPossibleMoveLabels();
 
     ChessPiece *clickedPiece = (ChessPiece*)sender();
@@ -563,7 +672,9 @@ void ChessGame::pieceClicked()
         //showExplosion(selectedDestination.x, selectedDestination.y);
     }
     debugLabel->setText(debugLabel->text() + "\nsx " + QString::number(selectedSource.x) + " sy " + QString::number(selectedSource.y) +
-                        " dx " + QString::number(selectedDestination.x) + " dy " + QString::number(selectedDestination.y));
+                                         " dx " + QString::number(selectedDestination.x) + " dy " + QString::number(selectedDestination.y));
+
+}
 }
 
 // New - delete if N/A
@@ -579,6 +690,10 @@ void ChessGame::clearPossibleMoveLabels()
 
 void ChessGame::mousePressEvent(QMouseEvent *e)
 {
+    if(enabled)
+    {
+
+
     // suck these constants out of the barrier piece at [0][0] which will always be there.
     // this is not necessarily elegant, but I do not want to duplicate these constants.
     // think of a more elegant way if this bothers you. (it should)
@@ -612,6 +727,7 @@ void ChessGame::mousePressEvent(QMouseEvent *e)
             movePiece(selectedSource, selectedDestination);
         }
     }
+   }
 }
 
  int whiteTakenx = 875;
@@ -726,11 +842,15 @@ bool ChessGame::movePiece(Position &source, Position &destination)
     {
         if (whoseTurnIsIt == White)
         {
+            timer1->stop();
+            timer2->start();
             whoseTurnIsIt = Black;
             turnLabel->setText("Black moves.\nClick piece to move.");
         }
         else
         {
+            timer2->stop();
+            timer1->start();
             whoseTurnIsIt = White;
             turnLabel->setText("White moves.\nClick piece to move.");
         }

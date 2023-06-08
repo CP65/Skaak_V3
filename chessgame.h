@@ -16,12 +16,20 @@ class ChessGame : public QWidget
 
 public:
     ChessGame(QWidget *parent = nullptr);
+
     void showExplosion(float x, float y);
 
     QPushButton *newGameButton;
     QPushButton *restartButton;
     QPushButton *mainMenuButton;
 
+    int seconds1;
+    int minutes1;
+    int seconds2;
+    int minutes2;
+
+    void disable();
+    void enable();
 
 private:
     void mousePressEvent(QMouseEvent*);
@@ -29,7 +37,9 @@ private:
     void playBackgroundMusic();
     void playMetal();
 
-    QTimer* timer;
+    QTimer *timer;
+    QTimer *timer1;
+    QTimer *timer2;
 
     Board board;
 
@@ -39,6 +49,8 @@ private:
     QLabel *getRektLabel;
     QLabel *debugLabel;
     QLabel *explosionLabel;
+    QLabel *timer2Label;
+    QLabel *timer1Label;
     QMovie* explosion;
 
     // Show move circles
@@ -50,6 +62,8 @@ private:
 
     QMediaPlayer* mediaPlayer;        // Player for the lofi song
     QMediaPlayer* soundEffectPlayer;  // Player for the sound effect
+
+    bool enabled;
 
 //signals:
 //    void finished();
@@ -65,6 +79,8 @@ private slots:
     void pieceClicked();
     void clearPossibleMoveLabels();
     void timertick();
+    void timer1tick();
+    void timer2tick();
     void restart();
     void newGame();
     void mainMenu();
