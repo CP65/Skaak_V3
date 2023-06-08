@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 
+
 class ChessGame : public QWidget
 {
     Q_OBJECT
@@ -23,10 +24,7 @@ public:
     QPushButton *newGameButton;
     QPushButton *restartButton;
     QPushButton *mainMenuButton;
-
     QLineEdit *lineEdit;
-    QString enteredText;
-    QByteArray text;
 
     int seconds1;
     int minutes1;
