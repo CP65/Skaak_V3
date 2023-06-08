@@ -7,6 +7,7 @@
 #include "castlepiece.h"
 #include "queenpiece.h"
 #include "kingpiece.h"
+#include "rankings.h"
 
 #include <QPainter>
 #include <QVBoxLayout>
@@ -18,10 +19,21 @@ bool p = 0;
 
 float x1 = 0;
 float y1 = 0;
+Rankings r;
 
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
+    lineEdit = new QLineEdit(this);
+    lineEdit->setPlaceholderText("Enter your text");  // Set a placeholder text
+    lineEdit->setMaxLength(100);  // Set a maximum length for the input
+    QString enteredText = lineEdit->text();
+    QByteArray text = enteredText.toUtf8();
+    connect(lineEdit, SIGNAL(QLineEdit::returnPressed), this, SLOT(ChessGame::handleTextEntered()));
+
+    //Rankings r;
+    r.addScore("deeznuts", 69);
+
    // QPushButton *newGameButton = new QPushButton("NEW GAME", this);
     newGameButton = new QPushButton("NEW GAME", this);
     connect (newGameButton, &QPushButton::clicked, this, &ChessGame::newGame);
@@ -78,6 +90,7 @@ ChessGame::ChessGame(QWidget *parent)
     mainMenuButton->hide();
 
     setFixedSize(1500, 1000);
+
     QPixmap background("background4.jpg");
     QPalette palette;
     palette.setBrush(QPalette::Background, QBrush(background.scaled(1500, 1000)));
@@ -230,6 +243,11 @@ ChessGame::ChessGame(QWidget *parent)
     }
 }
 
+void ChessGame::handleTextEntered()
+{
+   r.addScore("halloooooooooooooooooo", 69);
+}
+
 void ChessGame::timer1tick()
 {
 
@@ -297,7 +315,7 @@ void ChessGame::disable()
 
 void ChessGame::enable()
 {
-    enabled = 1;
+  enabled = 1;
 }
 
 void ChessGame::newGame()
