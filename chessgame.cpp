@@ -26,6 +26,14 @@ Rankings r;
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
 {
+    QString command = "isready\n";
+    responseLabel = new QLabel(this);
+    responseLabel->setText("ffffffffffffffffffffffffffff");
+    responseLabel->setGeometry(900, 600, 500, 100);
+    responseLabel->setStyleSheet("font-weight: bold;"
+                                 "font-size: 15px");
+
+
     fenLabel = new QLabel(this);
     fenLabel->setText("ffffffffffffffffffffffffffff");
     fenLabel->setGeometry(900, 500, 500, 100);
@@ -40,13 +48,17 @@ ChessGame::ChessGame(QWidget *parent)
     QByteArray text = enteredText.toUtf8();
     connect(lineEdit, SIGNAL(QLineEdit::returnPressed), this, SLOT(ChessGame::handleTextEntered()));
 
+    stockfishProcess = new QProcess(this);
+    stockfishProcess->start(stockfishPath);
     QString stockfishPath = "stockfish-windows-2022-x86-64-avx2.exe";
-    QProcess stockfishProcess;
-    stockfishProcess.start(stockfishPath);
+
+    sendCommandToStockfish(command);
+    readStockfishOutput();
+
 
     // Connect signals and slots to handle the communication
-    connect(&stockfishProcess, &QProcess::readyReadStandardOutput, this, &ChessGame::readStockfishOutput);
-    connect(&stockfishProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &ChessGame::stockfishProcessFinished);
+//    connect(stockfishProcess, SIGNAL(QProcess::readyReadStandardOutput), this, SLOT(ChessGame::readStockfishOutput));
+//    connect(&stockfishProcess, SIGNAL(QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished)), this, SLOT(ChessGame::stockfishProcessFinished));
 
     //Rankings r;
     r.addScore("deeznuts", 69);
@@ -260,7 +272,7 @@ ChessGame::ChessGame(QWidget *parent)
     }
 }
 
-void ChessGame::toFEN(Board)
+QString ChessGame::toFEN(Board)
 {
     QString roww = "";
     fenLabel->setText("");
@@ -361,21 +373,28 @@ void ChessGame::toFEN(Board)
 
     fenLabel->setText(roww);
 
-}
-
-void ChessGame::readStockfishOutput()
-{
-
-}
-
-void ChessGame::stockfishProcessFinished()
-{
+    return roww;
 
 }
 
 void ChessGame::sendCommandToStockfish(const QString& command)
 {
-    stockfishProcess.write((command + '\n').toUtf8());
+    stockfishProcess->start("stockfish-windows-2022-x86-64-avx2.exe");
+    stockfishProcess->write(command.toUtf8());
+}
+
+void ChessGame::readStockfishOutput()
+{
+    stockfishProcess->waitForReadyRead();
+    QString response = stockfishProcess->readLine();          //!!!!!!!!!!!!!!!!!ons soek net die laaste lyntjie van die response.
+//    QStringList lines = response.split("\n");
+//    QString lastLine = lines.last().trimmed();
+    responseLabel->setText(response.trimmed());
+}
+
+void ChessGame::stockfishProcessFinished()
+{
+
 }
 
 void ChessGame::handleTextEntered()
@@ -461,6 +480,10 @@ void ChessGame::newGame()
     timer1->start();
     timer2Label->show();
     enable();
+
+    command = "isready\n";
+    sendCommandToStockfish(command);
+    readStockfishOutput();
 
     //timer2->start();
     toFEN(board);
@@ -953,8 +976,6 @@ bool ChessGame::movePiece(Position &source, Position &destination)
 //                showExplosion(destination.x*75, destination.y*90);
                 showExplosion(x1, y1);
 
-
-
                 //move taken pieces to the side
                  if ((board[destination.x][destination.y]->colour() == White))
                  {
@@ -972,6 +993,7 @@ bool ChessGame::movePiece(Position &source, Position &destination)
                 board[source.x][source.y]->movePieceTo(destination.x, destination.y);
                 // Update board
                 board[destination.x][destination.y] = board[source.x][source.y];
+
                 board[source.x][source.y] = nullptr;
 
                 moved = true;
@@ -1014,7 +1036,12 @@ bool ChessGame::movePiece(Position &source, Position &destination)
         }
     }
 
-    toFEN(board);
+    command = "position fen <" + toFEN(board) + ">\n";
+
+    sendCommandToStockfish(command);
+    command = "go movetime 100\n";
+    sendCommandToStockfish(command);
+    readStockfishOutput();
 
     // In case someone cares
     return moved;

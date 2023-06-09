@@ -27,12 +27,12 @@ public:
     QPushButton *mainMenuButton;
     QLineEdit *lineEdit;
 
-    void readStockfishOutput();
-    void stockfishProcessFinished();
-    void sendCommandToStockfish(const QString& command);
-    void toFEN(Board);
 
-    QProcess stockfishProcess;
+    void sendCommandToStockfish(const QString& command);
+    void readStockfishOutput();
+    QString toFEN(Board);
+
+    QProcess *stockfishProcess;
 
     int seconds1;
     int minutes1;
@@ -64,7 +64,11 @@ private:
     QLabel *explosionLabel;
     QLabel *timer2Label;
     QLabel *timer1Label;
+    QLabel *responseLabel;
     QMovie* explosion;
+
+    QString stockfishPath;
+    QString command;
 
     // Show move circles
     QVector<QLabel*> possibleMoveLabels;
@@ -98,5 +102,7 @@ private slots:
     void newGame();
     void mainMenu();
     void handleTextEntered();
+
+    void stockfishProcessFinished();
 };
 #endif // CHESSGAME_H
