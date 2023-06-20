@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QProcess>
+#include <QRandomGenerator>
 
 
 class ChessGame : public QWidget
@@ -31,6 +32,7 @@ public:
     void sendCommandToStockfish(const QString& command);
     void readStockfishOutput();
     QString toFEN(Board);
+    QString cutResponse;
 
     QProcess *stockfishProcess;
 
@@ -38,6 +40,11 @@ public:
     int minutes1;
     int seconds2;
     int minutes2;
+
+    int randomIndex;
+
+    float x1 = 0;
+    float y1 = 0;
 
     void disable();
     void enable();

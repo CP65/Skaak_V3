@@ -19,9 +19,9 @@ int z = 0;
 int o = 0;
 bool p = 0;
 
-float x1 = 0;
-float y1 = 0;
 Rankings r;
+
+int t = 0;
 
 ChessGame::ChessGame(QWidget *parent)
     : QWidget(parent)
@@ -29,14 +29,16 @@ ChessGame::ChessGame(QWidget *parent)
     QString command = "isready\n";
     responseLabel = new QLabel(this);
     responseLabel->setText("ffffffffffffffffffffffffffff");
-    responseLabel->setGeometry(900, 600, 500, 100);
+    responseLabel->setGeometry(900, 600, 1000, 100);
     responseLabel->setStyleSheet("font-weight: bold;"
                                  "font-size: 15px");
 
 
+
+
     fenLabel = new QLabel(this);
     fenLabel->setText("ffffffffffffffffffffffffffff");
-    fenLabel->setGeometry(900, 500, 500, 100);
+    fenLabel->setGeometry(900, 550, 500, 100);
     fenLabel->setStyleSheet("font-weight: bold;"
                                "font-size: 15px");
     fenLabel->hide();
@@ -49,16 +51,15 @@ ChessGame::ChessGame(QWidget *parent)
     connect(lineEdit, SIGNAL(QLineEdit::returnPressed), this, SLOT(ChessGame::handleTextEntered()));
 
     stockfishProcess = new QProcess(this);
-    stockfishProcess->start(stockfishPath);
     QString stockfishPath = "stockfish-windows-2022-x86-64-avx2.exe";
+    stockfishProcess->start(stockfishPath);
 
     sendCommandToStockfish(command);
     readStockfishOutput();
 
-
-    // Connect signals and slots to handle the communication
-//    connect(stockfishProcess, SIGNAL(QProcess::readyReadStandardOutput), this, SLOT(ChessGame::readStockfishOutput));
-//    connect(&stockfishProcess, SIGNAL(QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished)), this, SLOT(ChessGame::stockfishProcessFinished));
+    //connect signals and slots to handle the communication
+    //connect(stockfishProcess, SIGNAL(QProcess::readyReadStandardOutput), this, SLOT(ChessGame::readStockfishOutput));
+    //connect(&stockfishProcess, SIGNAL(QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished)), this, SLOT(ChessGame::stockfishProcessFinished));
 
     //Rankings r;
     r.addScore("deeznuts", 69);
@@ -120,11 +121,11 @@ ChessGame::ChessGame(QWidget *parent)
 
     setFixedSize(1500, 1000);
 
-    QPixmap background("background4.jpg");
-    QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(background.scaled(1500, 1000)));
-    setAutoFillBackground(true);
-    setPalette(palette);
+//    QPixmap background("background4.jpg");
+//    QPalette palette;
+//    palette.setBrush(QPalette::Background, QBrush(background.scaled(1500, 1000)));
+//    //setAutoFillBackground(true);
+//    setPalette(palette);
 
 
     timer = new QTimer(this);
@@ -385,11 +386,200 @@ void ChessGame::sendCommandToStockfish(const QString& command)
 
 void ChessGame::readStockfishOutput()
 {
-    stockfishProcess->waitForReadyRead();
-    QString response = stockfishProcess->readLine();          //!!!!!!!!!!!!!!!!!ons soek net die laaste lyntjie van die response.
-//    QStringList lines = response.split("\n");
-//    QString lastLine = lines.last().trimmed();
-    responseLabel->setText(response.trimmed());
+    int move = 0;
+       QString response = stockfishProcess->readAllStandardOutput();  //!!!!!!!!!!!!!!!!!ons soek net die laaste lyntjie van die response.
+
+       QStringList lines = response.split("\n");
+       QString lastLine = lines.last();
+
+       QString cutResponse = response.right(18).left(4);
+       responseLabel->setText(cutResponse);
+
+       Position source;
+       Position destination;
+       source.x = 0;
+       source.y = 0;
+       destination.x = 0;
+       destination.y = 0;
+//----------------------------------------------- source x value
+       if(cutResponse[0] == "a")
+       {
+           source.x = 2;
+           move = 1;
+       }
+       else if(cutResponse[0] == "b")
+       {
+           source.x = 3;
+           move = 1;
+       }
+       else if(cutResponse[0] == "c")
+       {
+           source.x = 4;
+           move = 1;
+       }
+       else if(cutResponse[0] == "d")
+       {
+           source.x = 5;
+           move = 1;
+       }
+       else if(cutResponse[0] == "e")
+       {
+           source.x = 6;
+           move = 1;
+       }
+       else if(cutResponse[0] == "f")
+       {
+           source.x = 7;
+           move = 1;
+       }
+       else if(cutResponse[0] == "g")
+       {
+           source.x = 8;
+           move = 1;
+       }
+       else if(cutResponse[0] == "h")
+       {
+           source.x = 9;
+           move = 1;
+       }
+
+//----------------------------------------------- source y value
+      if(cutResponse[1] == "8")
+      {
+          source.y = 2;
+          move += 1;
+      }
+      else if(cutResponse[1] == "7")
+      {
+          source.y = 3;
+          move += 1;
+      }
+      else if(cutResponse[1] == "6")
+      {
+          source.y = 4;
+          move += 1;
+      }
+      else if(cutResponse[1] == "5")
+      {
+          source.y = 5;
+          move += 1;
+      }
+      else if(cutResponse[1] == "4")
+      {
+          source.y = 6;
+         move += 1;
+      }
+      else if(cutResponse[1] == "3")
+      {
+          source.y = 7;
+          move += 1;
+      }
+      else if(cutResponse[1] == "2")
+      {
+          source.y = 8;
+          move += 1;
+      }
+      else if(cutResponse[1] == "1")
+      {
+          source.y = 9;
+         move += 1;
+      }
+
+//-----------------------------------------------destination x value
+      if(cutResponse[2] == "a")
+      {
+          destination.x = 2;
+         move += 1;
+      }
+      else if(cutResponse[2] == "b")
+      {
+          destination.x = 3;
+          move += 1;
+      }
+      else if(cutResponse[2] == "c")
+      {
+          destination.x = 4;
+          move += 1;
+      }
+      else if(cutResponse[2] == "d")
+      {
+          destination.x = 5;
+          move += 1;
+      }
+      else if(cutResponse[2] == "e")
+      {
+          destination.x = 6;
+          move += 1;
+      }
+      else if(cutResponse[2] == "f")
+      {
+          destination.x = 7;
+          move += 1;
+      }
+      else if(cutResponse[2] == "g")
+      {
+          destination.x = 8;
+          move += 1;
+      }
+      else if(cutResponse[2] == "h")
+      {
+          destination.x = 9;
+          move += 1;
+      }
+
+//-----------------------------------------------destination x value
+
+      if(cutResponse[3] == "8")
+      {
+          destination.y = 2;
+          move += 1;
+      }
+      else if(cutResponse[3] == "7")
+      {
+          destination.y = 3;
+          move += 1;
+      }
+      else if(cutResponse[3] == "6")
+      {
+          destination.y = 4;
+          move += 1;
+      }
+      else if(cutResponse[3] == "5")
+      {
+          destination.y = 5;
+          move += 1;
+      }
+      else if(cutResponse[3] == "4")
+      {
+          destination.y = 6;
+          move += 1;
+      }
+      else if(cutResponse[3] == "3")
+      {
+          destination.y = 7;
+          move += 1;
+      }
+      else if(cutResponse[3] == "2")
+      {
+          destination.y = 8;
+          move += 1;
+      }
+      else if(cutResponse[3] == "1")
+      {
+          destination.y = 9;
+          move += 1;
+      }
+
+      fenLabel->setText("source x = " + QString::number(source.x) + "  "
+                      + "source y = " + QString::number(source.y) + "\n"
+                      + "dest x = " + QString::number(destination.x) + "  "
+                      + "dest y = " + QString::number(destination.y) + "\n");
+
+      if(move == 4)
+      {
+           movePiece(source, destination);
+      }
+
 }
 
 void ChessGame::stockfishProcessFinished()
@@ -599,7 +789,13 @@ void ChessGame::restart()
         connect(board[i][9], SIGNAL(iWasClicked()), this, SLOT(pieceClicked()));
     }
 
-    toFEN(board);
+   // toFEN(board);
+
+    command = "position fen <" + toFEN(board) + ">\n";
+    sendCommandToStockfish(command);
+    command = "go movetime 100\n";
+    sendCommandToStockfish(command);
+    readStockfishOutput();
 
 }
 
@@ -737,6 +933,26 @@ void ChessGame::timertick()
         }
     }
 
+    if(t == 0)
+    {
+        randomIndex = QRandomGenerator::global()->bounded(100,600);
+    }
+
+
+    else if(t > randomIndex)
+    {
+        if(whoseTurnIsIt == Black)
+        {
+            command = "position fen <" + toFEN(board) + ">\n";
+            sendCommandToStockfish(command);
+            command = "go movetime 100\n";
+            sendCommandToStockfish(command);
+            t = 0;
+            readStockfishOutput();
+        }
+    }
+
+   t += 1;
 }
 
 void ChessGame::playBackgroundMusic()
@@ -745,7 +961,8 @@ void ChessGame::playBackgroundMusic()
     // Set up the media content for the lofi song
     QMediaContent lofiSongContent(QUrl("paganini_1.mp3"));
     mediaPlayer->setMedia(lofiSongContent);
-    mediaPlayer->setVolume(20);
+    mediaPlayer->setVolume(0
+                           );
 
     // Connect the mediaStatusChanged signal to the handleSoundEffectFinished slot
     //connect(mediaPlayer, soundEffectPlayer->mediaStatusChanged, this, ChessGame::resumeBackground());
@@ -760,7 +977,7 @@ void ChessGame::playMetal()
     soundEffectPlayer = new QMediaPlayer(this);
     QMediaContent soundEffectContent(QUrl("pieceTakenMusic.mp3"));
     soundEffectPlayer->setMedia(soundEffectContent);
-    soundEffectPlayer->setVolume(50);
+    soundEffectPlayer->setVolume(0);
     // Play the sound effect
     mediaPlayer->pause();
     soundEffectPlayer->play();
@@ -1025,7 +1242,8 @@ bool ChessGame::movePiece(Position &source, Position &destination)
             timer1->stop();
             timer2->start();
             whoseTurnIsIt = Black;
-            turnLabel->setText("Black moves.\nClick piece to move.");
+            turnLabel->setText("Black moves.\nPlease wait for AI to move.");
+
         }
         else
         {
@@ -1035,13 +1253,6 @@ bool ChessGame::movePiece(Position &source, Position &destination)
             turnLabel->setText("White moves.\nClick piece to move.");
         }
     }
-
-    command = "position fen <" + toFEN(board) + ">\n";
-
-    sendCommandToStockfish(command);
-    command = "go movetime 100\n";
-    sendCommandToStockfish(command);
-    readStockfishOutput();
 
     // In case someone cares
     return moved;
